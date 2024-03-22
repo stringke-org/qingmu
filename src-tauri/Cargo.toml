@@ -28,5 +28,5 @@ anyhow = "1.0.81"
 hyperpolyglot = { git = "https://github.com/StringKe/hyperpolyglot.git", branch = "master" }
 uuid = "1.8.0"
 deno_runtime = "0.150.0"
-deno_core = "0.272.0"
+ebus = "1.3.0"
 

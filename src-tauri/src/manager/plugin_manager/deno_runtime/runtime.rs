@@ -1,130 +1,68 @@
-use std::iter::once;
 use std::rc::Rc;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
-use deno_core::error::AnyError;
-use deno_core::located_script_name;
-use deno_core::ModuleLoader;
-use deno_core::v8_set_flags;
-use deno_runtime::BootstrapOptions;
+use deno_runtime::{BootstrapOptions, WorkerLogLevel};
 use deno_runtime::deno_broadcast_channel::InMemoryBroadcastChannel;
-use deno_runtime::deno_web::BlobStore;
-use deno_runtime::permissions::Permissions;
-use deno_runtime::worker::MainWorker;
-use deno_runtime::worker::WorkerOptions;
-use tokio::sync::mpsc::Sender;
+use deno_runtime::deno_core::{located_script_name, ModuleLoader, ModuleSpecifier};
+use deno_runtime::permissions::PermissionsContainer;
+use deno_runtime::worker::{MainWorker, WorkerOptions};
 use tokio::task;
 
-use crate::manager::events_manager::EventsManager;
-use crate::manager::events_manager::messages::AppMessage;
-
-use super::ops;
-
-pub struct DenoRuntime {
-    pub deno_sender: Sender<AppMessage>,
-    pub events_manager: EventsManager,
+pub struct Runtime {
+    // 通过 event-bus ?
 }
 
-impl DenoRuntime {
-    pub fn new(deno_sender: Sender<AppMessage>, events_manager: EventsManager) -> Self {
-        Self {
-            deno_sender,
-            events_manager,
-        }
-    }
-
-    pub async fn run_deno(&self, module_loader: impl ModuleLoader + 'static) {
+impl Runtime {
+    pub async fn create(entrypoint: ModuleSpecifier, module_loader: impl ModuleLoader + 'static) -> Arc<Mutex<MainWorker>> {
         let module_loader = Rc::new(module_loader);
-        let create_web_worker_cb = Arc::new(|_| {
-            todo!("Web workers are not supported");
-        });
 
-        let web_worker_preload_module_cb = Arc::new(|_| {
-            todo!("Web workers are not supported");
-        });
-
-        v8_set_flags(
-            once("UNUSED_BUT_NECESSARY_ARG0".to_owned())
-                .chain(Vec::new().iter().cloned())
-                .collect::<Vec<_>>(),
-        );
-
-        let options = WorkerOptions {
-            bootstrap: BootstrapOptions {
-                args: vec![],
-                is_tty: false,
-                cpu_count: 1,
-                debug_flag: false,
-                enable_testing_features: false,
-                location: None,
-                no_color: false,
-                runtime_version: "1.21.0".to_string(),
-                ts_version: "4.6.2".to_string(),
-                unstable: self.metadata.config.unstable,
-            },
-            extensions: vec![ops::new(
-                self.deno_sender.clone(),
-                self.events_manager.clone(),
-            )],
-            unsafely_ignore_certificate_errors: None,
-            root_cert_store: None,
-            user_agent: "astrodon".to_string(),
-            seed: None,
-            js_error_create_fn: None,
-            create_web_worker_cb,
-            web_worker_preload_module_cb,
-            maybe_inspector_server: None,
-            should_break_on_first_statement: false,
-            module_loader,
-            get_error_class_fn: Some(&get_error_class_name),
-            origin_storage_dir: None,
-            blob_store: BlobStore::default(),
-            broadcast_channel: InMemoryBroadcastChannel::default(),
-            shared_array_buffer_store: None,
-            compiled_wasm_module_store: None,
-            source_map_getter: None,
+        let bootstrap_options = BootstrapOptions {
+            args: vec![],
+            is_tty: false,
+            cpu_count: 1,
+            enable_testing_features: false,
+            locale: deno_runtime::deno_core::v8::icu::get_language_tag(),
+            location: None,
+            log_level: WorkerLogLevel::Info,
+            no_color: false,
+            unstable: true,
+            ..Default::default()
         };
 
-        let permissions = Permissions::from_options(&self.metadata.config.permissions);
+        let worker_options = WorkerOptions {
+            bootstrap: bootstrap_options,
+            module_loader,
+            broadcast_channel: InMemoryBroadcastChannel::default(),
+            fs: Arc::new(deno_runtime::deno_fs::RealFs),
+            should_wait_for_inspector_session: false,
+            ..Default::default()
+        };
 
         let mut worker = MainWorker::bootstrap_from_options(
-            self.metadata.entrypoint.clone(),
-            permissions,
-            options,
+            entrypoint.clone(),
+            PermissionsContainer::allow_all(),
+            worker_options,
         );
+        let worker_shared = Arc::new(Mutex::new(worker));
+
+        let worker_clone = worker_shared.clone();
 
         let error_handler = |err| {
-            // TO-DO: Also display a small window with the error when running in astrodon-tauri-standalone
-            println!("{err}");
+            // TO-DO: 显示一个带有错误的小窗口
+            println!("Worker error: {:?}", err);
             std::process::exit(1);
         };
 
         let local = task::LocalSet::new();
 
-        local
-            .run_until(async move {
-                worker
-                    .execute_main_module(&self.metadata.entrypoint)
-                    .await
-                    .unwrap_or_else(error_handler);
+        local.run_until(async move {
+            let mut worker = worker_clone.lock().unwrap();
+            worker.execute_main_module(&entrypoint).await.unwrap_or_else(error_handler);
+            worker.dispatch_load_event(&located_script_name!()).unwrap_or_else(error_handler);
+            worker.run_event_loop(true).await.unwrap_or_else(error_handler);
+            worker.dispatch_load_event(&located_script_name!()).unwrap_or_else(error_handler);
+        }).await;
 
-                worker
-                    .dispatch_load_event(&located_script_name!())
-                    .unwrap_or_else(error_handler);
-
-                worker
-                    .run_event_loop(true)
-                    .await
-                    .unwrap_or_else(error_handler);
-
-                worker
-                    .dispatch_load_event(&located_script_name!())
-                    .unwrap_or_else(error_handler);
-            })
-            .await;
+        worker_shared
     }
-}
-
-fn get_error_class_name(e: &AnyError) -> &'static str {
-    deno_runtime::errors::get_error_class_name(e).unwrap_or("Error")
 }
