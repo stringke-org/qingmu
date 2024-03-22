@@ -1,0 +1,17 @@
+@import 'tailwind.css';
+
+html,
+body,
+#root {
+  @apply relative h-screen w-screen text-foreground;
+}
+
+#root {
+  @apply overflow-hidden p-[2px];
+}
+
+.app-header {
+  & > *:not(.drag-handle) {
+    z-index: 10;
+  }
+}

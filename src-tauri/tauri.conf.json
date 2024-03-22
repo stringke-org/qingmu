@@ -1,0 +1,38 @@
+{
+    "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+    "productName": "qingmu",
+    "version": "0.0.0",
+    "identifier": "com.tauri.dev",
+    "build": {
+        "beforeDevCommand": "pnpm fe:dev",
+        "devUrl": "http://localhost:1420",
+        "beforeBuildCommand": "pnpm fe:build",
+        "frontendDist": "../dist"
+    },
+    "app": {
+        "macOSPrivateApi": true,
+        "windows": [
+            {
+                "title": "qingmu",
+                "width": 1280,
+                "height": 720,
+                "minHeight": 720,
+                "minWidth": 1280,
+                "hiddenTitle": true,
+                "center": true,
+                "shadow": false,
+                "decorations": false,
+                "acceptFirstMouse": true,
+                "transparent": true
+            }
+        ],
+        "security": {
+            "csp": null
+        }
+    },
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
+    }
+}
