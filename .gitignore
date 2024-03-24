@@ -23,4 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
+crates/*/target
+src-tauri/target
+
 .idea
