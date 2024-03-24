@@ -1,26 +1,14 @@
 use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
 
-use clipboard_rs::{ClipboardHandler, ClipboardWatcher, ClipboardWatcherContext};
+use clipboard_rs::{ClipboardWatcher, ClipboardWatcherContext};
 
-use crate::manager::clipboard_manager::ClipboardManager;
+use crate::manager::clipboard_manager::{ClipboardManager, ClipboardManagerProxy};
 use crate::models::config::AppConfig;
 
 pub static APP_CONFIG: OnceLock<Arc<Mutex<AppConfig>>> = OnceLock::new();
 pub static CLIPBOARD_MANAGER: OnceLock<Arc<Mutex<ClipboardManager>>> = OnceLock::new();
 pub static CLIPBOARD_WATCHER: OnceLock<Arc<Mutex<ClipboardWatcherContext<ClipboardManagerProxy>>>> =
     OnceLock::new();
-
-struct ClipboardManagerProxy {
-    manager: Arc<Mutex<ClipboardManager>>,
-}
-
-impl ClipboardHandler for ClipboardManagerProxy {
-    fn on_clipboard_change(&mut self) {
-        if let Ok(mut manager) = self.manager.lock() {
-            manager.on_clipboard_change();
-        }
-    }
-}
 
 pub async fn init_clipboard() {
     let manager = Arc::new(Mutex::new(ClipboardManager::new()));

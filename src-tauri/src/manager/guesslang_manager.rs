@@ -1,5 +1,4 @@
 use std::path::Path;
-use std::str::FromStr;
 
 use hyperpolyglot::Detection;
 

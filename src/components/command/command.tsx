@@ -1,13 +1,13 @@
 import useToggle from 'beautiful-react-hooks/useToggle';
-import { useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import {useRef} from 'react';
+import {useTranslation} from 'react-i18next';
 
-import { cn } from '~/lib/utils';
+import {cn} from '~/lib/utils';
 
 export function AppCommand() {
     const inputRef = useRef<HTMLInputElement>(null);
     const [isFocus, toggleFocus] = useToggle(false);
-    const { t } = useTranslation('command');
+    const {t} = useTranslation('command');
 
     const text = `{"user":1....`;
 
@@ -28,14 +28,10 @@ export function AppCommand() {
         inputRef.current?.removeEventListener('paste', onClipboard);
     }
 
-    return (
-        <div
-            className={cn(
-                'max-2-[640px] flex h-8 min-w-[360px] gap-1 overflow-hidden rounded-md border bg-background px-1 text-sm transition',
-                {
-                    'ring-2 ring-ring ring-offset-2': isFocus,
-                },
-            )}
+    return (<div
+            className={cn('max-2-[640px] flex h-8 min-w-[360px] gap-1 overflow-hidden rounded-md border bg-background px-1 text-sm transition cursor-pointer', {
+                'ring-2 ring-ring ring-offset-2': isFocus,
+            },)}
         >
             <div
                 className={cn('m-0.5 flex gap-1 overflow-hidden rounded border transition', {
@@ -55,6 +51,5 @@ export function AppCommand() {
                 onBlur={onBlur}
                 autoFocus
             />
-        </div>
-    );
+        </div>);
 }
