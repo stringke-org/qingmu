@@ -31,7 +31,7 @@ export function AppCommand() {
     return (
         <div
             className={cn(
-                'max-2-[640px] flex h-8 min-w-[360px] cursor-pointer gap-1 overflow-hidden rounded-md border bg-background px-1 text-sm transition',
+                'max-2-[640px] flex h-10 min-w-[360px] cursor-pointer gap-1 overflow-hidden rounded-md border bg-background px-1 text-sm transition',
                 {
                     'ring-2 ring-ring ring-offset-2': isFocus,
                 },

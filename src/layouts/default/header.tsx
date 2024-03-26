@@ -20,7 +20,7 @@ import { SettingsButton } from './settings-button';
 
 export function AppHeader() {
     return (
-        <div className={'relative w-full border-b py-0.5'}>
+        <div className={'relative h-10 w-full border-b py-0.5'}>
             <Menubar className={'app-header relative z-10 border-none '}>
                 <div
                     data-tauri-drag-region='true'
