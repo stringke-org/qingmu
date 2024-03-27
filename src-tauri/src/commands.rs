@@ -21,7 +21,9 @@ pub fn save_app_config(state: tauri::State<'_, AppState>, config: AppConfig) {
 }
 
 #[tauri::command]
-pub fn get_clipboard_text() -> Result<String> {
+pub fn get_clipboard_text(state: tauri::State<'_, AppState>) -> Result<String> {
+    // 无法移动
+    // let clipboard_context = state.0.lock().unwrap().clipboard_context;
     let clipboard_context = ClipboardContext::new().unwrap();
     match clipboard_context.get_text() {
         Ok(str) => {

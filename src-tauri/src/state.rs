@@ -1,5 +1,7 @@
 use std::sync::Mutex;
 
+use clipboard_rs::ClipboardContext;
+
 use crate::manager::guesslang_manager::GuessLangManager;
 use crate::models::config::AppConfig;
 
@@ -14,6 +16,7 @@ impl Default for AppState {
 pub struct InnerAppState {
     pub config: AppConfig,
     pub guesslang_manager: GuessLangManager,
+    pub clipboard_context: ClipboardContext,
 }
 
 impl InnerAppState {
@@ -21,6 +24,7 @@ impl InnerAppState {
         Self {
             config: AppConfig::load(),
             guesslang_manager: GuessLangManager::new(),
+            clipboard_context: ClipboardContext::new().unwrap(),
         }
     }
 }
