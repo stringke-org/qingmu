@@ -1,6 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { DefaultLayout } from '../layouts';
+import { DefaultLayout } from '~/layouts';
+import { SettingsPage } from '~/pages/settings';
+
 import { WelcomePage } from './welcome';
 
 export const router = createBrowserRouter([
@@ -10,6 +12,10 @@ export const router = createBrowserRouter([
             {
                 path: '/',
                 element: <WelcomePage />,
+            },
+            {
+                path: '/settings',
+                element: <SettingsPage />,
             },
         ],
     },

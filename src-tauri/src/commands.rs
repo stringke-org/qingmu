@@ -36,9 +36,9 @@ pub fn get_clipboard_text() -> Result<String> {
 }
 
 #[tauri::command]
-pub fn set_clipboard_text(text: String) -> Result<()> {
+pub fn set_clipboard_text(value: String) -> Result<()> {
     let clipboard_context = ClipboardContext::new().unwrap();
-    clipboard_context.set_text(text).unwrap();
+    clipboard_context.set_text(value).unwrap();
     Ok(())
 }
 
@@ -57,9 +57,9 @@ pub fn get_clipboard_image() -> Result<(String, String)> {
 }
 
 #[tauri::command]
-pub fn set_clipboard_image(data: String) -> Result<()> {
+pub fn set_clipboard_image(value: String) -> Result<()> {
     let clipboard_context = ClipboardContext::new().unwrap();
-    let image = RustImageData::from_path(&*data);
+    let image = RustImageData::from_path(&*value);
     match image {
         Ok(image) => {
             clipboard_context.set_image(image).unwrap();
@@ -87,9 +87,9 @@ pub fn get_clipboard_html() -> Result<String> {
 }
 
 #[tauri::command]
-pub fn set_clipboard_html(html: String) -> Result<()> {
+pub fn set_clipboard_html(value: String) -> Result<()> {
     let clipboard_context = ClipboardContext::new().unwrap();
-    clipboard_context.set_html(html).unwrap();
+    clipboard_context.set_html(value).unwrap();
     Ok(())
 }
 
@@ -109,9 +109,9 @@ pub fn get_clipboard_rtf() -> Result<String> {
 }
 
 #[tauri::command]
-pub fn set_clipboard_rtf(rtf: String) -> Result<()> {
+pub fn set_clipboard_rtf(value: String) -> Result<()> {
     let clipboard_context = ClipboardContext::new().unwrap();
-    clipboard_context.set_rich_text(rtf).unwrap();
+    clipboard_context.set_rich_text(value).unwrap();
     Ok(())
 }
 
@@ -127,16 +127,16 @@ pub fn get_clipboard_files() -> Result<Vec<String>> {
 }
 
 #[tauri::command]
-pub fn set_clipboard_files(files: Vec<String>) -> Result<()> {
+pub fn set_clipboard_files(value: Vec<String>) -> Result<()> {
     let clipboard_context = ClipboardContext::new().unwrap();
-    clipboard_context.set_files(files).unwrap();
+    clipboard_context.set_files(value).unwrap();
     Ok(())
 }
 
 #[tauri::command]
-pub fn get_clipboard_format(format: String) -> Result<Vec<ClipboardContent>> {
+pub fn get_clipboard_format(value: String) -> Result<Vec<ClipboardContent>> {
     let clipboard_context = ClipboardContext::new().unwrap();
-    let formats = vec![ContentFormat::Other(format.to_string())];
+    let formats = vec![ContentFormat::Other(value.to_string())];
 
     match clipboard_context.get(formats.as_slice()) {
         Ok(items) => {
@@ -156,9 +156,9 @@ pub fn get_clipboard_format(format: String) -> Result<Vec<ClipboardContent>> {
 }
 
 #[tauri::command]
-pub fn set_clipboard_format(format: String, data: Vec<u8>) -> Result<()> {
+pub fn set_clipboard_format(value: String, data: Vec<u8>) -> Result<()> {
     let clipboard_context = ClipboardContext::new().unwrap();
-    match clipboard_context.set_buffer(&*format, data) {
+    match clipboard_context.set_buffer(&*value, data) {
         Ok(_) => Ok(()),
         Err(_) => Err(Error::from(anyhow::anyhow!(
             "Failed to set clipboard format"

@@ -3,14 +3,14 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub version: u8,
-    pub api_key: String,
+    pub npm_registry: String,
 }
 
 impl Default for AppConfig {
     fn default() -> Self {
         Self {
             version: 1,
-            api_key: "".to_string(),
+            npm_registry: "https://registry.npmjs.org/".to_string(),
         }
     }
 }

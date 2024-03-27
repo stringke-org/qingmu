@@ -1,4 +1,5 @@
 import { Translation } from 'react-i18next';
+import { NavLink } from 'react-router-dom';
 
 import { AppCommand } from '~/components/command';
 import { Button } from '~/components/ui/button';
@@ -20,8 +21,8 @@ import { SettingsButton } from './settings-button';
 
 export function AppHeader() {
     return (
-        <div className={'relative h-10 w-full border-b py-0.5'}>
-            <Menubar className={'app-header relative z-10 border-none '}>
+        <div className={'relative h-[52px] w-full border-b py-0.5'}>
+            <Menubar className={'app-header relative z-10 h-full border-none py-0 '}>
                 <div
                     data-tauri-drag-region='true'
                     className={'drag-handle absolute left-0 top-0 h-full w-full touch-none'}
@@ -48,16 +49,20 @@ export function AppHeader() {
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
-                <Button
-                    variant={'ghost'}
-                    size={'sm'}
-                >
-                    <Translation ns={'menu'}>{($t) => $t('pluginMarket')}</Translation>
-                </Button>
-                <div className={'!mx-auto'}>
+                {/*<Button*/}
+                {/*    variant={'ghost'}*/}
+                {/*    size={'sm'}*/}
+                {/*>*/}
+                {/*    <NavLink to='/ai'>*/}
+                {/*        <Translation ns={'menu'}>{($t) => $t('pluginMarket')}</Translation>*/}
+                {/*    </NavLink>*/}
+                {/*</Button>*/}
+                <div className={'!mx-auto h-full'}>
                     <AppCommand />
                 </div>
-                <SettingsButton />
+                <NavLink to='/settings'>
+                    <SettingsButton />
+                </NavLink>
                 <LanguageSwitcher />
                 <ColorSwitcher />
                 <MenuButton>
